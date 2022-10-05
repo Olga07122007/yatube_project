@@ -1,26 +1,21 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 
-# Create your views here.
-
-from django.http import HttpResponse
+from .models import Post, Group
 
 
-# Главная страница
 def index(request):
-    print()
-    print('Hello!!!!!')
-    print()
-    
-    return HttpResponse('<h1 style="color: green;">Главная страница!!!</h1>')
+    posts = Post.objects.order_by('-pub_date')[:10]
+    context = {
+       'posts': posts,
+    }
+    return render(request, 'posts/index.html', context)
 
 
-# Страница со списком мороженого
-def group_posts(request, pk):
-    print()
-    print(f'Мы в группах!!! {pk}')
-    print()
-    print(request, '8888888888')
-    print()
-    
-    
-    return HttpResponse(f'Группа {pk}')
+def group_posts(request, slug):
+    group = get_object_or_404(Group, slug=slug)
+    posts = Post.objects.filter(group=group).order_by('-pub_date')[:10]
+    context = {
+        'group': group,
+        'posts': posts,
+    }
+    return render(request, 'posts/group_list.html', context)
